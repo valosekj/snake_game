@@ -41,7 +41,8 @@ head_image = load_image(head_path)
 
 # Define text properties for counter
 label = pyglet.text.Label(color=(255, 0, 0, 255), x=1/2*SQUARE_SIZE[0], y=1/2*SQUARE_SIZE[1], font_size=36)
-
+# Define text properties for gameover sign
+gameover = pyglet.text.Label(color=(255, 0, 0, 255), x=1/4*WINDOW_SIZE[0], y=1/2*WINDOW_SIZE[1], font_size=25)
 
 class Snake:
 
@@ -109,7 +110,8 @@ class Snake:
         """
         End game and print score
         """
-        exit('GAME OVER\nSCORE: {}'.format(str(self.score_counter)))
+        gameover.text = ('GAME OVER - SCORE: {}'.format(str(self.score_counter)))
+        #exit('GAME OVER\nSCORE: {}'.format(str(self.score_counter)))
 
 
 def show():
@@ -146,6 +148,7 @@ def on_draw():
     batch.draw()
     label.text = (str(my_snake.score_counter))  # update counter
     label.draw()                                # display counter
+    gameover.draw()
 
 
 @window.event
