@@ -49,7 +49,7 @@ class Snake:
         self.speed = 1 / 4                                  # snake speed in seconds
         self.snake_positions = [[3, 5], [3, 4], [3, 3]]     # initial snake
         self.direction = 'UP'                               # initial direction of snake movement
-        self.counter = 0                                    # initial score counter
+        self.score_counter = 0                              # initial score counter
         #self.apple_position = [7, 7]                       # initial food position
         self.place_apple()                                  # generate initial food position randomly
 
@@ -71,7 +71,7 @@ class Snake:
         # Snake ate apple, so generate new apple positions and do not shorten snake
         if new_head == self.apple_position:
             self.place_apple()
-            self.counter += 1       # increment score counter
+            self.score_counter += 1       # increment score counter
             self.increase_speed()
         # END game when snake hits window's edge
         elif new_head[0] < 0 or new_head[0] >= WINDOW_SIZE[0] / SQUARE_SIZE[0] or new_head[1] < 0 or new_head[1] >= \
@@ -101,15 +101,15 @@ class Snake:
         """
         Increase snake speed
         """
-        if self.counter in range(0,50,5):
-            self.speed = self.speed / 2
-        # TODO - it looks that change of self.speed here does not influence speed in pyglet.clock.schedule_interval
+        if self.score_counter in range(0,50,5):
+            self.speed = self.speed / 1.5
+            pyglet.clock._default._current_interval_item.interval = self.speed  # refresh pyglet.clock variable
 
     def print_end(self):
         """
         End game and print score
         """
-        exit('GAME OVER\nSCORE: {}'.format(str(self.counter)))
+        exit('GAME OVER\nSCORE: {}'.format(str(self.score_counter)))
 
 
 def show():
@@ -144,8 +144,8 @@ def on_draw():
     window.clear()
     batch = show()
     batch.draw()
-    label.text = (str(my_snake.counter))    # update counter
-    label.draw()                            # display counter
+    label.text = (str(my_snake.score_counter))  # update counter
+    label.draw()                                # display counter
 
 
 @window.event
@@ -165,7 +165,6 @@ my_snake = Snake()      # create instance of Snake class
 
 def move(dt):
     my_snake.move()     # call periodically method from Snake class in interval defined by speed variable
-
 
 pyglet.clock.schedule_interval(move, my_snake.speed)
 
