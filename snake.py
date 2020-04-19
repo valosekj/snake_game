@@ -117,20 +117,22 @@ def show():
     Create batch containing snake parts and food
     :return: batch
     """
+    # drawing multiple sprites - https://pyglet.readthedocs.io/en/latest/modules/sprite.html
+    # all individual sprites are batched into batch using Batch method
     batch = pyglet.graphics.Batch()
 
+    # SNAKE's HEAD
     objects.append(pyglet.sprite.Sprite(head_image, my_snake.snake_positions[0][0] * SQUARE_SIZE[0],
                                         my_snake.snake_positions[0][1] * SQUARE_SIZE[1], batch=batch))
     # TODO - add head rotation
     #objects[0].rotation = 180
 
-    # drawing multiple sprites - https://pyglet.readthedocs.io/en/latest/modules/sprite.html
-    # all individual sprites are batched into batch using Batch method
+    # SNAKE's BODY
     for x, y in my_snake.snake_positions[1:]:
         # snake_parts - list of sprite objects
         objects.append(pyglet.sprite.Sprite(green_image, x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch))
 
-    # food
+    # FOOD
     objects.append(pyglet.sprite.Sprite(apple_image, my_snake.apple_position[0] * SQUARE_SIZE[0],
                                         my_snake.apple_position[1] * SQUARE_SIZE[1], batch=batch))
 
@@ -163,6 +165,7 @@ my_snake = Snake()      # create instance of Snake class
 
 def move(dt):
     my_snake.move()     # call periodically method from Snake class in interval defined by speed variable
+
 
 pyglet.clock.schedule_interval(move, my_snake.speed)
 
