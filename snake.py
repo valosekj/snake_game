@@ -14,8 +14,6 @@ SQUARE_SIZE = [64, 64]      # tile size in px
 WINDOW_SIZE = [640, 640]    # window size in px
 TILES_DIRECTORY = Path('snake-tiles')
 
-objects = list()            # list of sprite objects (snake parts and food)
-
 # create main window
 window = pyglet.window.Window(width=WINDOW_SIZE[0], height=WINDOW_SIZE[1])
 
@@ -87,7 +85,6 @@ class Snake:
             self.snake_positions.pop()
 
         self.snake_positions.insert(0, new_head)
-        print(self.snake_positions)
 
     def place_apple(self):
         """
@@ -117,7 +114,7 @@ class Snake:
         exit('GAME OVER\nSCORE: {}'.format(str(self.score_counter)))
 
 
-def show():
+def show(objects):
     """
     Create batch containing snake parts and food
     :return: batch
@@ -129,15 +126,23 @@ def show():
     # SNAKE's HEAD
     objects.append(pyglet.sprite.Sprite(snake_tiles['bottom-tongue'], my_snake.snake_positions[0][0] * SQUARE_SIZE[0],
                                         my_snake.snake_positions[0][1] * SQUARE_SIZE[1], batch=batch))
-    # head rotattion
-    objects[-1].rotation = my_snake.snake_positions[0][2]
+    # head's rotattion
+    objects[0].rotation = my_snake.snake_positions[0][2]
 
-    # TODO - add body and tail rotation
+    # TODO - add bend rotation
 
     # SNAKE's BODY
-    for x, y, _ in my_snake.snake_positions[1:]:
+    for x, y, orientation in my_snake.snake_positions[1:-1]:
         # snake_parts - list of sprite objects
-        objects.append(pyglet.sprite.Sprite(snake_tiles['end-end'], x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch))
+        body_part = pyglet.sprite.Sprite(snake_tiles['bottom-bottom'], x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch)
+        body_part.rotation = orientation
+        objects.append(body_part)
+
+    # SNAKE's TAIL
+    objects.append(pyglet.sprite.Sprite(snake_tiles['end-top'], my_snake.snake_positions[-1][0] * SQUARE_SIZE[0],
+                                        my_snake.snake_positions[-1][1] * SQUARE_SIZE[1], batch=batch))
+    # tail's rotation
+    objects[-1].rotation = my_snake.snake_positions[-1][2]
 
     # FOOD
     objects.append(pyglet.sprite.Sprite(snake_tiles['apple'], my_snake.apple_position[0] * SQUARE_SIZE[0],
@@ -149,7 +154,8 @@ def show():
 @window.event
 def on_draw():
     window.clear()
-    batch = show()
+    objects = list()    # list of sprite objects (snake parts and food)
+    batch = show(objects)
     batch.draw()
     label.text = (str(my_snake.score_counter))  # update counter
     label.draw()                                # display counter
