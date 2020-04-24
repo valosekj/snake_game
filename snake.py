@@ -15,7 +15,7 @@ WINDOW_SIZE = [640, 640]    # window size in px
 TILES_DIRECTORY = Path('snake-tiles')
 
 # create main window
-window = pyglet.window.Window(width=WINDOW_SIZE[0], height=WINDOW_SIZE[1])
+window = pyglet.window.Window(width=WINDOW_SIZE[0], height=WINDOW_SIZE[1], caption='SNAKE')
 
 def load_image(filename):
     """
@@ -38,7 +38,7 @@ label = pyglet.text.Label(color=(255, 0, 0, 255), x=1/2*SQUARE_SIZE[0], y=1/2*SQ
 class Snake:
 
     def __init__(self):
-        self.speed = 1 / 4                                # snake speed in seconds
+        self.speed = 1 / 4                               # snake speed in seconds
         self.snake_positions = [[3, 5, 'top'], [3, 4, 'top'], [3, 3, 'top']]     # initial snake
         self.direction = 'UP'                               # initial direction of snake movement
         self.score_counter = 0                              # initial score counter
