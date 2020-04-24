@@ -2,7 +2,7 @@
 #
 # Final project for pyladies course - SNAKE game
 #
-# Jan Valosek, VER = 23-04-2020
+# Jan Valosek, VER = 24-04-2020
 #
 #########################################################################################
 
@@ -17,8 +17,6 @@ TILES_DIRECTORY = Path('snake-tiles')
 # create main window
 window = pyglet.window.Window(width=WINDOW_SIZE[0], height=WINDOW_SIZE[1])
 
-# TODO - snake has anchor in middle -> does not fit properly to game window
-
 def load_image(filename):
     """
     Load image
@@ -26,8 +24,6 @@ def load_image(filename):
     :return: loaded image
     """
     image = pyglet.image.load(filename)
-    image.anchor_x = image.width // 2
-    image.anchor_y = image.height // 2
     return image
 
 snake_tiles = {}
@@ -42,8 +38,8 @@ label = pyglet.text.Label(color=(255, 0, 0, 255), x=1/2*SQUARE_SIZE[0], y=1/2*SQ
 class Snake:
 
     def __init__(self):
-        self.speed = 1 / 4                                  # snake speed in seconds
-        self.snake_positions = [[3, 5, 0, 'top'], [3, 4, 0, 'top'], [3, 3, 0, 'top']]     # initial snake
+        self.speed = 1 / 4                                # snake speed in seconds
+        self.snake_positions = [[3, 5, 'top'], [3, 4, 'top'], [3, 3, 'top']]     # initial snake
         self.direction = 'UP'                               # initial direction of snake movement
         self.score_counter = 0                              # initial score counter
         #self.apple_position = [7, 7]                       # initial food position
@@ -54,23 +50,19 @@ class Snake:
         Change snake position based on direction.
         Direction is changed by key press.
         """
-        new_head = [self.snake_positions[0][0], self.snake_positions[0][1], self.snake_positions[0][2], self.snake_positions[0][3]]
+        new_head = [self.snake_positions[0][0], self.snake_positions[0][1], self.snake_positions[0][2]]
         if self.direction == 'UP':
             new_head[1] += 1
-            new_head[2] = 0
-            new_head[3] = 'top'
+            new_head[2] = 'top'
         elif self.direction == 'DOWN':
             new_head[1] -= 1
-            new_head[2] = 180
-            new_head[3] = 'bottom'
+            new_head[2] = 'bottom'
         elif self.direction == 'RIGHT':
             new_head[0] += 1
-            new_head[2] = 90
-            new_head[3] = 'right'
+            new_head[2] = 'right'
         elif self.direction == 'LEFT':
             new_head[0] -= 1
-            new_head[2] = 270
-            new_head[3] = 'left'
+            new_head[2] = 'left'
 
         # Snake ate apple, so generate new apple positions and do not shorten snake
         if new_head[:2] == self.apple_position:
@@ -82,7 +74,7 @@ class Snake:
                 WINDOW_SIZE[1] / SQUARE_SIZE[1]:
             self.print_end()
         # END game when snake hits itself
-        elif new_head[:2] in [[x, y] for x, y, _, _ in self.snake_positions]:
+        elif new_head[:2] in [[x, y] for x, y, _ in self.snake_positions]:
             self.print_end()
         # Delete last element from snake
         else:
@@ -98,7 +90,7 @@ class Snake:
             self.apple_position = [randint(1, WINDOW_SIZE[0] / SQUARE_SIZE[0] - 1),
                                    randint(1, WINDOW_SIZE[1] / SQUARE_SIZE[1] - 1)]
             # if food is not in snake break loop
-            if self.apple_position not in [[x, y] for x, y, _, _ in self.snake_positions]:
+            if self.apple_position not in [[x, y] for x, y, _ in self.snake_positions]:
                 break
 
     def increase_speed(self):
@@ -127,39 +119,36 @@ def show(objects):
     # all individual sprites are batched into batch using Batch method
     batch = pyglet.graphics.Batch()
 
-    for index, (x, y, orientation, _) in enumerate(my_snake.snake_positions[:-1]):
+    for index, (x, y, _) in enumerate(my_snake.snake_positions[:-1]):
 
         # SNAKE's HEAD
         if index == 0:
             objects.append(
-                pyglet.sprite.Sprite(snake_tiles['bottom-tongue'], my_snake.snake_positions[0][0] * SQUARE_SIZE[0],
+                pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][2] + '-tongue'], my_snake.snake_positions[0][0] * SQUARE_SIZE[0],
                                      my_snake.snake_positions[0][1] * SQUARE_SIZE[1], batch=batch))
-            # head's rotation
-            objects[0].rotation = my_snake.snake_positions[0][2]
 
         # SNAKE's BEND
         elif my_snake.snake_positions[index][2] != my_snake.snake_positions[index-1][2]:
 
-            bend_part = pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][3] + '-' +
-                                                         my_snake.snake_positions[index-1][3]], x * SQUARE_SIZE[0],
+            bend_part = pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index-1][2] + '-' +
+                                                         my_snake.snake_positions[index][2]], x * SQUARE_SIZE[0],
                                                          y * SQUARE_SIZE[1], batch=batch)
             objects.append(bend_part)
 
         # SNAKE's BODY
-        elif index > 0 and index < len(my_snake.snake_positions):
+        elif index > 0 and index < len(my_snake.snake_positions)-1:
             # snake_parts - list of sprite objects
-            body_part = pyglet.sprite.Sprite(snake_tiles['bottom-bottom'], x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch)
-            # snake's body part rotation
-            body_part.rotation = orientation
+            body_part = pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][2] + '-' +
+                                                         my_snake.snake_positions[index][2]],
+                                             x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch)
             objects.append(body_part)
 
-        # SNAKE's TAIL
-        objects.append(
-            pyglet.sprite.Sprite(snake_tiles['end-top'], my_snake.snake_positions[-1][0] * SQUARE_SIZE[0],
-                                 my_snake.snake_positions[-1][1] * SQUARE_SIZE[1], batch=batch))
-        # tail's rotation
-        objects[-1].rotation = my_snake.snake_positions[-2][2]
 
+        # SNAKE's TAIL
+
+        objects.append(pyglet.sprite.Sprite(snake_tiles['tail-' + my_snake.snake_positions[-2][2]],
+                                                        my_snake.snake_positions[-1][0] * SQUARE_SIZE[0],
+                                        my_snake.snake_positions[-1][1] * SQUARE_SIZE[1], batch=batch))
 
     # FOOD
     objects.append(pyglet.sprite.Sprite(snake_tiles['apple'], my_snake.apple_position[0] * SQUARE_SIZE[0],
