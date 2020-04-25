@@ -10,12 +10,13 @@ import pyglet
 from random import randint
 from pathlib import Path
 
-SQUARE_SIZE = [64, 64]      # tile size in px
-WINDOW_SIZE = [640, 640]    # window size in px
+SQUARE_SIZE = [64, 64]  # tile size in px
+WINDOW_SIZE = [640, 640]  # window size in px
 TILES_DIRECTORY = Path('snake-tiles')
 
 # create main window
 window = pyglet.window.Window(width=WINDOW_SIZE[0], height=WINDOW_SIZE[1], caption='SNAKE')
+
 
 def load_image(filename):
     """
@@ -26,24 +27,27 @@ def load_image(filename):
     image = pyglet.image.load(filename)
     return image
 
+
 snake_tiles = {}
 for path in TILES_DIRECTORY.glob('*.png'):
     snake_tiles[path.stem] = load_image(path)
 
 # Define text properties for counter
-label = pyglet.text.Label(color=(255, 0, 0, 255), x=1/2*SQUARE_SIZE[0], y=1/2*SQUARE_SIZE[1], font_size=36)
+label = pyglet.text.Label(color=(255, 0, 0, 255), x=1 / 2 * SQUARE_SIZE[0], y=1 / 2 * SQUARE_SIZE[1], font_size=36)
+
+
 # Define text properties for gameover sign
-#gameover = pyglet.text.Label(color=(255, 0, 0, 255), x=1/4*WINDOW_SIZE[0], y=1/2*WINDOW_SIZE[1], font_size=25)
+# gameover = pyglet.text.Label(color=(255, 0, 0, 255), x=1/4*WINDOW_SIZE[0], y=1/2*WINDOW_SIZE[1], font_size=25)
 
 class Snake:
 
     def __init__(self):
-        self.speed = 1 / 4                               # snake speed in seconds
-        self.snake_positions = [[3, 5, 'top'], [3, 4, 'top'], [3, 3, 'top']]     # initial snake
-        self.direction = 'UP'                               # initial direction of snake movement
-        self.score_counter = 0                              # initial score counter
-        #self.apple_position = [7, 7]                       # initial food position
-        self.place_apple()                                  # generate initial food position randomly
+        self.speed = 1 / 4  # snake speed in seconds
+        self.snake_positions = [[3, 5, 'top'], [3, 4, 'top'], [3, 3, 'top']]  # initial snake
+        self.direction = 'UP'  # initial direction of snake movement
+        self.score_counter = 0  # initial score counter
+        # self.apple_position = [7, 7]  # initial food position
+        self.place_apple()  # generate initial food position randomly
 
     def move(self):
         """
@@ -67,7 +71,7 @@ class Snake:
         # Snake ate apple, so generate new apple positions and do not shorten snake
         if new_head[:2] == self.apple_position:
             self.place_apple()
-            self.score_counter += 1       # increment score counter
+            self.score_counter += 1  # increment score counter
             self.increase_speed()
         # END game when snake hits window's edge
         elif new_head[0] < 0 or new_head[0] >= WINDOW_SIZE[0] / SQUARE_SIZE[0] or new_head[1] < 0 or new_head[1] >= \
@@ -97,16 +101,16 @@ class Snake:
         """
         Increase snake speed
         """
-        if self.score_counter in range(0,50,5):
+        if self.score_counter in range(0, 50, 5):
             self.speed = self.speed / 1.5
-            pyglet.clock.unschedule(move)                       # unregister move
-            pyglet.clock.schedule_interval(move, self.speed)    # set new interval
+            pyglet.clock.unschedule(move)  # unregister move
+            pyglet.clock.schedule_interval(move, self.speed)  # set new interval
 
     def print_end(self):
         """
         End game and print score
         """
-        #gameover.text = ('GAME OVER - SCORE: {}'.format(str(self.score_counter)))
+        # gameover.text = ('GAME OVER - SCORE: {}'.format(str(self.score_counter)))
         exit('GAME OVER\nSCORE: {}'.format(str(self.score_counter)))
 
 
@@ -123,32 +127,26 @@ def show(objects):
 
         # SNAKE's HEAD
         if index == 0:
-            objects.append(
-                pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][2] + '-tongue'], my_snake.snake_positions[0][0] * SQUARE_SIZE[0],
-                                     my_snake.snake_positions[0][1] * SQUARE_SIZE[1], batch=batch))
+            objects.append(pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][2] + '-tongue'],
+                                                my_snake.snake_positions[0][0] * SQUARE_SIZE[0],
+                                                my_snake.snake_positions[0][1] * SQUARE_SIZE[1], batch=batch))
 
         # SNAKE's BEND
-        elif my_snake.snake_positions[index][2] != my_snake.snake_positions[index-1][2]:
-
-            bend_part = pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index-1][2] + '-' +
-                                                         my_snake.snake_positions[index][2]], x * SQUARE_SIZE[0],
-                                                         y * SQUARE_SIZE[1], batch=batch)
-            objects.append(bend_part)
+        elif my_snake.snake_positions[index][2] != my_snake.snake_positions[index - 1][2]:
+            objects.append(pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index - 1][2] + '-' +
+                                                            my_snake.snake_positions[index][2]], x * SQUARE_SIZE[0],
+                                                y * SQUARE_SIZE[1], batch=batch))
 
         # SNAKE's BODY
-        elif index > 0 and index < len(my_snake.snake_positions)-1:
-            # snake_parts - list of sprite objects
-            body_part = pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][2] + '-' +
-                                                         my_snake.snake_positions[index][2]],
-                                             x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch)
-            objects.append(body_part)
-
+        elif 0 < index < len(my_snake.snake_positions) - 1:
+            objects.append(pyglet.sprite.Sprite(snake_tiles[my_snake.snake_positions[index][2] + '-' +
+                                                            my_snake.snake_positions[index][2]],
+                                                x * SQUARE_SIZE[0], y * SQUARE_SIZE[1], batch=batch))
 
         # SNAKE's TAIL
-
         objects.append(pyglet.sprite.Sprite(snake_tiles['tail-' + my_snake.snake_positions[-2][2]],
-                                                        my_snake.snake_positions[-1][0] * SQUARE_SIZE[0],
-                                        my_snake.snake_positions[-1][1] * SQUARE_SIZE[1], batch=batch))
+                                            my_snake.snake_positions[-1][0] * SQUARE_SIZE[0],
+                                            my_snake.snake_positions[-1][1] * SQUARE_SIZE[1], batch=batch))
 
     # FOOD
     objects.append(pyglet.sprite.Sprite(snake_tiles['apple'], my_snake.apple_position[0] * SQUARE_SIZE[0],
@@ -160,12 +158,12 @@ def show(objects):
 @window.event
 def on_draw():
     window.clear()
-    objects = list()    # list of sprite objects (snake parts and food)
+    objects = list()  # list of sprite objects (snake parts and food)
     batch = show(objects)
     batch.draw()
     label.text = (str(my_snake.score_counter))  # update counter
-    label.draw()                                # display counter
-    #gameover.draw()
+    label.draw()  # display counter
+    # gameover.draw()
 
 
 @window.event
@@ -180,11 +178,12 @@ def on_key_press(key_code, modifier):
         my_snake.direction = 'LEFT'
 
 
-my_snake = Snake()      # create instance of Snake class
+my_snake = Snake()  # create instance of Snake class
 
 
 def move(dt):
-    my_snake.move()     # call periodically method from Snake class in interval defined by speed variable
+    my_snake.move()  # call periodically method from Snake class in interval defined by speed variable
+
 
 pyglet.clock.schedule_interval(move, my_snake.speed)
 
