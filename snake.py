@@ -91,10 +91,11 @@ class Snake:
         Generate position of food outside of snake.
         """
         while True:
-            self.apple_position = [randint(1, WINDOW_SIZE[0] / SQUARE_SIZE[0] - 1),
-                                   randint(1, WINDOW_SIZE[1] / SQUARE_SIZE[1] - 1)]
+            apple_position_candidate = [randint(1, WINDOW_SIZE[0] / SQUARE_SIZE[0] - 1),
+                                        randint(1, WINDOW_SIZE[1] / SQUARE_SIZE[1] - 1)]
             # if food is not in snake break loop
-            if self.apple_position not in [[x, y] for x, y, _ in self.snake_positions]:
+            if apple_position_candidate not in [[x, y] for x, y, _ in self.snake_positions]:
+                self.apple_position = apple_position_candidate
                 break
 
     def increase_speed(self):
