@@ -6,6 +6,7 @@
 #
 #########################################################################################
 
+import time
 import pyglet
 from random import randint
 from pathlib import Path
@@ -37,14 +38,15 @@ label = pyglet.text.Label(color=(255, 0, 0, 255), x=1 / 2 * SQUARE_SIZE[0], y=1 
 
 
 # Define text properties for gameover sign
-# gameover = pyglet.text.Label(color=(255, 0, 0, 255), x=1/4*WINDOW_SIZE[0], y=1/2*WINDOW_SIZE[1], font_size=25)
+gameover = pyglet.text.Label(color=(255, 0, 0, 255), x=1/4*WINDOW_SIZE[0], y=1/2*WINDOW_SIZE[1], font_size=25)
 
 class Snake:
 
     def __init__(self):
         self.speed = 1 / 4  # snake speed in seconds
         self.snake_positions = [[3, 5, 'top'], [3, 4, 'top'], [3, 3, 'top']]  # initial snake
-        self.direction = 'UP'  # initial direction of snake movement
+        self.direction = (0, 1)  # initial direction of snake movement
+        self.direction_new = (0, 1)
         self.score_counter = 0  # initial score counter
         # self.apple_position = [7, 7]  # initial food position
         self.place_apple()  # generate initial food position randomly
@@ -55,16 +57,23 @@ class Snake:
         Direction is changed by key press.
         """
         new_head = [self.snake_positions[0][0], self.snake_positions[0][1], self.snake_positions[0][2]]
-        if self.direction == 'UP':
+
+        # Control if opposite direction was not entered
+        old_x, old_y = self.direction
+        new_x, new_y = self.direction_new
+        if (old_x, old_y) != (-new_x, -new_y):
+            self.direction = self.direction_new
+
+        if self.direction == (0, 1):
             new_head[1] += 1
             new_head[2] = 'top'
-        elif self.direction == 'DOWN':
+        elif self.direction == (0, -1):
             new_head[1] -= 1
             new_head[2] = 'bottom'
-        elif self.direction == 'RIGHT':
+        elif self.direction == (1, 0):
             new_head[0] += 1
             new_head[2] = 'right'
-        elif self.direction == 'LEFT':
+        elif self.direction == (-1, 0):
             new_head[0] -= 1
             new_head[2] = 'left'
 
@@ -111,7 +120,10 @@ class Snake:
         """
         End game and print score
         """
-        # gameover.text = ('GAME OVER - SCORE: {}'.format(str(self.score_counter)))
+        # TODO - GAMEOVER text is not shown at the end
+        gameover.text = ('GAME OVER - SCORE: {}'.format(str(self.score_counter)))
+        gameover.draw()
+        time.sleep(3)
         exit('GAME OVER\nSCORE: {}'.format(str(self.score_counter)))
 
 
@@ -164,19 +176,18 @@ def on_draw():
     batch.draw()
     label.text = (str(my_snake.score_counter))  # update counter
     label.draw()  # display counter
-    # gameover.draw()
 
 
 @window.event
 def on_key_press(key_code, modifier):
     if key_code == pyglet.window.key.UP:
-        my_snake.direction = 'UP'
+        my_snake.direction_new = 0, 1
     elif key_code == pyglet.window.key.DOWN:
-        my_snake.direction = 'DOWN'
+        my_snake.direction_new = 0, -1
     elif key_code == pyglet.window.key.RIGHT:
-        my_snake.direction = 'RIGHT'
+        my_snake.direction_new = 1, 0
     elif key_code == pyglet.window.key.LEFT:
-        my_snake.direction = 'LEFT'
+        my_snake.direction_new = -1, 0
 
 
 my_snake = Snake()  # create instance of Snake class
