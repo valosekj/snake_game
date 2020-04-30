@@ -14,7 +14,8 @@ from pathlib import Path
 SQUARE_SIZE = [64, 64]  # tile size in px
 WINDOW_SIZE = [640, 640]  # window size in px
 TILES_DIRECTORY = Path('snake-tiles')
-KEY_MAPPING = {
+# mapping of keys pressed for moving the snake -> (X, Y) change in coordinates
+DIRECTION_MAPPING = {
     pyglet.window.key.UP: (0, 1),
     pyglet.window.key.DOWN: (0, -1),
     pyglet.window.key.RIGHT: (1, 0),
@@ -51,8 +52,8 @@ class Snake:
     def __init__(self):
         self.speed = 1 / 4  # snake speed in seconds
         self.snake_positions = [[3, 5, 'top'], [3, 4, 'top'], [3, 3, 'top']]  # initial snake
-        self.direction = KEY_MAPPING[pyglet.window.key.UP]  # initial direction of snake movement
-        self.direction_new = KEY_MAPPING[pyglet.window.key.UP]
+        self.direction = DIRECTION_MAPPING[pyglet.window.key.UP]  # initial direction of snake movement
+        self.direction_new = DIRECTION_MAPPING[pyglet.window.key.UP]
         self.score_counter = 0  # initial score counter
         # self.apple_position = [7, 7]  # initial food position
         self.place_apple()  # generate initial food position randomly
@@ -70,16 +71,16 @@ class Snake:
         if (old_x, old_y) != (-new_x, -new_y):
             self.direction = self.direction_new
 
-        if self.direction == KEY_MAPPING[pyglet.window.key.UP]:
+        if self.direction == DIRECTION_MAPPING[pyglet.window.key.UP]:
             new_head[1] += 1
             new_head[2] = 'top'
-        elif self.direction == KEY_MAPPING[pyglet.window.key.DOWN]:
+        elif self.direction == DIRECTION_MAPPING[pyglet.window.key.DOWN]:
             new_head[1] -= 1
             new_head[2] = 'bottom'
-        elif self.direction == KEY_MAPPING[pyglet.window.key.RIGHT]:
+        elif self.direction == DIRECTION_MAPPING[pyglet.window.key.RIGHT]:
             new_head[0] += 1
             new_head[2] = 'right'
-        elif self.direction == KEY_MAPPING[pyglet.window.key.LEFT]:
+        elif self.direction == DIRECTION_MAPPING[pyglet.window.key.LEFT]:
             new_head[0] -= 1
             new_head[2] = 'left'
 
@@ -186,8 +187,8 @@ def on_draw():
 
 @window.event
 def on_key_press(key_code, modifier):
-    if key_code in KEY_MAPPING:
-        my_snake.direction_new = KEY_MAPPING[key_code]
+    if key_code in DIRECTION_MAPPING:
+        my_snake.direction_new = DIRECTION_MAPPING[key_code]
 
 
 my_snake = Snake()  # create instance of Snake class
